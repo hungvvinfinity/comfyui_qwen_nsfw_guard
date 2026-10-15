@@ -58,6 +58,30 @@ class GuardTests(unittest.TestCase):
         guard._cached_clip = None
         guard._cached_path = None
 
+    def test_unsupported_language_rejection(self):
+        verdict_responses = [
+            "VERDICT: NOT_ENGLISH\nREASON: The prompt is in Vietnamese.",
+            "VERDICT: NOT ENGLISH\nREASON: Only English is supported at this time.",
+            "VERDICT: UNSUPPORTED_LANGUAGE\nREASON: Chinese is not supported.",
+        ]
+        for resp in verdict_responses:
+            with self.subTest(resp=resp), patch.object(guard.comfy.model_management, "interrupt_current_processing") as interrupt:
+                self.clip.tokenizer.decode.return_value = resp
+                with self.assertRaisesRegex(guard.UnsupportedLanguageError, "language not supported, only support english at this time"):
+                    guard.QwenNSFWPromptGuard().check("vẽ cho tôi một con mèo", clip=self.clip)
+                interrupt.assert_called_once_with(True)
+
+    def test_prompt_policy_language_requirement(self):
+        self.assertIn("Language policy:", guard._PROMPT_POLICY)
+        self.assertIn("NOT_ENGLISH", guard._PROMPT_POLICY)
+        self.assertIn("English", guard._PROMPT_POLICY)
+
+    def test_image_policy_does_not_require_language(self):
+        self.assertNotIn("NOT_ENGLISH", guard._IMAGE_POLICY)
+        self.assertNotIn("Language policy:", guard._IMAGE_POLICY)
+
+
+
     @unittest.skipUnless(REAL, "Use --real for checkpoint inference")
     def test_real_model(self):
         prompt = "A peaceful mountain landscape with trees and a blue sky."

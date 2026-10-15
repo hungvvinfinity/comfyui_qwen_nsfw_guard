@@ -9,12 +9,14 @@ It moderates both text prompts and images (input images and generated output ima
 ## Features
 
 - **Local Qwen3-VL 8B Inference**: Reuses the `qwen3vl_8b_int8_convrot.safetensors` model in `models/text_encoders/` or `models/clip/`.
+- **English Prompt Validation**: Validates that text prompts are in English. Prompts in other languages (Vietnamese, Chinese, Japanese, Korean, Spanish, French, German, Russian, etc.) immediately interrupt execution with `language not supported, only support english at this time` before loading/running the model.
 - **Fail-Closed Immediate Interruption**: On NSFW detection, triggers `comfy.model_management.interrupt_current_processing(True)` and raises `NSFWDetectedError`, instantly halting the execution graph so no downstream nodes (like generation or saving) run.
 - **Prompt & Image Moderation**: Moderates text prompts, image inputs (e.g. img2img / reference images), and final generated output images.
 - **Batch Image Support**: Evaluates all images in a tensor batch (`[B, H, W, C]`).
 - **Thread-Safe Model Caching**: Loads the text encoder / VLM once and retains it in memory across workflow runs; supports reusing an upstream `CLIP` connection or auto-loading.
 - **Pass-Through Outputs**: When safe, passes through `prompt` and `image` untouched, along with an audit JSON report.
 - **Standalone or Inline**: Configured as `OUTPUT_NODE = True`, allowing execution both inline in a pipeline or as a terminal safety inspector.
+
 
 ---
 
@@ -85,6 +87,12 @@ If an NSFW verdict is reached:
 NSFWDetectedError: Qwen NSFW Guard blocked prompt: VERDICT: NSFW
 REASON: Contains explicit sexual content, exposed genitals, and uncensored nudity as defined in NSFW criteria.
 ```
+
+If a prompt is not in English (e.g. Vietnamese, Chinese, Japanese, etc.):
+```
+UnsupportedLanguageError: language not supported, only support english at this time
+```
+
 
 ---
 
