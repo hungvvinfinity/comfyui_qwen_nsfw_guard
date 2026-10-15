@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comfyui-qwen-nsfw-guard"
+version = "0.1.0"
+description = "Local NSFW guard for ComfyUI using Qwen3-VL 8B (qwen3vl_8b_int8_convrot)"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Hung Vu", email = "hungvv@infinitytech.global" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.5",
+]
+
+[project.urls]
+Repository = "https://github.com/hungvu/comfyui-qwen-nsfw-guard"
+
+[tool.comfy]
+PublisherId = "hungvu"
+DisplayName = "Qwen NSFW Guard"
+Icon = ""

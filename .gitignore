@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Caches and virtual environments
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+env/
+venv/
+.env
+
+# Model weights and checkpoints (do not commit large safetensors/checkpoints)
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+*.onnx
+
+# OS generated files
+.DS_Store
+Thumbs.db
