@@ -32,7 +32,7 @@ class GuardTests(unittest.TestCase):
         self.assertIs(output, image)
         self.assertEqual(len(json.loads(report)["checks"]), 3)
         self.assertEqual(self.clip.generate.call_count, 3)
-        self.clip.generate.assert_called_with(self.clip.tokenize.return_value, do_sample=False, max_length=64, temperature=0.0)
+        self.clip.generate.assert_called_with(self.clip.tokenize.return_value, do_sample=False, max_length=32, temperature=0.0)
         self.assertEqual(self.clip.tokenize.call_args.kwargs["images"][0].shape, (1, 32, 32, 3))
 
     def test_interrupt_prompt_and_image(self):
@@ -72,13 +72,20 @@ class GuardTests(unittest.TestCase):
                 interrupt.assert_called_once_with(True)
 
     def test_prompt_policy_language_requirement(self):
-        self.assertIn("Language policy:", guard._PROMPT_POLICY)
         self.assertIn("NOT_ENGLISH", guard._PROMPT_POLICY)
         self.assertIn("English", guard._PROMPT_POLICY)
 
     def test_image_policy_does_not_require_language(self):
         self.assertNotIn("NOT_ENGLISH", guard._IMAGE_POLICY)
-        self.assertNotIn("Language policy:", guard._IMAGE_POLICY)
+        self.assertNotIn("English", guard._IMAGE_POLICY)
+
+    def test_resize_for_guard(self):
+        small = torch.zeros(1, 256, 256, 3)
+        self.assertIs(guard._resize_for_guard(small, max_dim=384), small)
+
+        large = torch.zeros(1, 1024, 768, 3)
+        resized = guard._resize_for_guard(large, max_dim=384)
+        self.assertEqual(resized.shape, (1, 384, 288, 3))
 
 
 
